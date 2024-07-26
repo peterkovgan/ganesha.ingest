@@ -1,5 +1,7 @@
 package com.ganesha.ingest;
 
+import com.ganesha.ingest.page.Page;
+import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.context.event.ApplicationReadyEvent;
 import org.springframework.context.ApplicationListener;
@@ -8,6 +10,7 @@ import org.springframework.stereotype.Component;
 import java.io.IOException;
 
 @Component
+@Log4j2
 public class ApplicationStartup implements ApplicationListener<ApplicationReadyEvent> {
 
     @Autowired
@@ -34,7 +37,8 @@ public class ApplicationStartup implements ApplicationListener<ApplicationReadyE
         //TODO: start flow from step X, implement how new flow step starts after the last with delay
 
         try {
-            reader.read("https://www.bbc.com/news");
+            Page page = reader.read("https://www.bbc.com/news").get();
+            log.info("Page type {} content {}", page.getClass().getSimpleName(), page.toContent());
         } catch (IOException e) {
             throw new RuntimeException(e);
         }

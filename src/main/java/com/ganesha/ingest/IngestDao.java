@@ -1,5 +1,6 @@
 package com.ganesha.ingest;
 
+import com.ganesha.ingest.page.Page;
 import org.springframework.stereotype.Component;
 
 @Component

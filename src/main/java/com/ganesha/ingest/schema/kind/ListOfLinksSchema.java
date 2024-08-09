@@ -15,14 +15,14 @@ public class ListOfLinksSchema extends ParametrizedParsingSchema<ListOfLinksPage
 {
 
     public static final String LINK_PATTERN = "linkPattern";
-    public static final String PARENT = "parent";
+    public static final String URL_GROUP = "urlGroup";
+    public static final String HTTP = "http";
+    public static final String LINK_PREFIX = "linkPrefix";
 
     @Override
-    public ListOfLinksPage convert(String body) {
+    public ListOfLinksPage convert(String body, int level, String calledUrl) {
 
         String linkPattern = params.get(LINK_PATTERN);
-        String parent = params.get(PARENT);
-
         List<String> allMatches = new ArrayList<>();
 
         Pattern pattern = Pattern.compile(linkPattern);
@@ -33,16 +33,23 @@ public class ListOfLinksSchema extends ParametrizedParsingSchema<ListOfLinksPage
             allMatches.add(m.group());
         }
 
+        String prefix = params.get(LINK_PREFIX);
+
+        int urlGroup = Integer.valueOf(params.get(URL_GROUP));
+
         List<String> links = allMatches.stream().map(e->{
             Matcher linkMatcher = pattern.matcher(e);
             if(linkMatcher.matches()){
-                String url = linkMatcher.group(1);
-                return url;
+                String url = linkMatcher.group(urlGroup);
+                if(url.startsWith(HTTP)){
+                    return url;
+                }
+                return prefix + url;
             }
             return null;
         }).filter(e->e!=null).toList();
 
-        return new ListOfLinksPage(parent, links);
+        return new ListOfLinksPage(level, calledUrl, links);
     }
 
     @Override
